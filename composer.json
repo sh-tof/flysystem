@@ -1,6 +1,6 @@
 {
     "name": "sh-tof/flysystem",
-    "description": "Filesystem abstraction: Many filesystems, one API.",
+    "description": "Filesystem abstraction: Many filesystems, one API. For PHP 5.3",
     "keywords": [
         "filesystem", "filesystems", "files", "storage", "dropbox", "aws",
         "abstraction", "s3", "ftp", "sftp", "remote", "webdav",
