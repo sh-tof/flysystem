@@ -1,5 +1,5 @@
 {
-    "name": "league/flysystem",
+    "name": "sh-tof/flysystem",
     "description": "Filesystem abstraction: Many filesystems, one API.",
     "keywords": [
         "filesystem", "filesystems", "files", "storage", "dropbox", "aws",
@@ -14,12 +14,12 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9"
+        "php": ">=5.3.3"
     },
     "require-dev": {
         "ext-fileinfo": "*",
-        "phpspec/phpspec": "^3.4",
-        "phpunit/phpunit": "^5.7"
+        "phpspec/phpspec": "^2.5",
+        "phpunit/phpunit": "^4.8"
     },
     "autoload": {
         "psr-4": {
@@ -29,10 +29,7 @@
     "autoload-dev": {
         "psr-4": {
             "League\\Flysystem\\Stub\\": "stub/"
-        },
-        "files": [
-          "tests/PHPUnitHacks.php"
-        ]
+        }
     },
     "suggest": {
         "ext-fileinfo": "Required for MimeType",

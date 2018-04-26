@@ -5,15 +5,9 @@ services:
 language: php
 
 php:
-  - 5.5
+  - 5.3
   - 5.6
-  - 7.0
-  - 7.1
   - 7.2
-
-matrix:
-  allow_failures:
-  - php: 5.5
 
 sudo: false
 
@@ -25,7 +19,7 @@ before_install:
   - mkdir tests/files
 
 install:
-  - if [[ "${TRAVIS_PHP_VERSION}" == "5.5" ]]; then composer require phpunit/phpunit:^4.8.36 phpspec/phpspec:^2 --prefer-dist --update-with-dependencies; fi
+  - if [[ "${TRAVIS_PHP_VERSION}" == "5.3" ]]; then composer require phpunit/phpunit:^4.8.36 phpspec/phpspec:^2 --prefer-dist --update-with-dependencies; fi
   - if [[ "${TRAVIS_PHP_VERSION}" == "7.2" ]]; then composer require phpunit/phpunit:^6.0 --prefer-dist --update-with-dependencies; fi
   - if [[ "${TRAVIS_PHP_VERSION}" == "7.2" ]]; then composer require --dev phpstan/phpstan:^0.9.2 --prefer-dist --update-with-dependencies; fi
   - travis_retry composer update --prefer-dist $COMPOSER_OPTS

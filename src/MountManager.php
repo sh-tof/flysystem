@@ -4,8 +4,8 @@ namespace League\Flysystem;
 
 use InvalidArgumentException;
 use League\Flysystem\FilesystemNotFoundException;
-use League\Flysystem\Plugin\PluggableTrait;
 use League\Flysystem\Plugin\PluginNotFoundException;
+use LogicException;
 
 /**
  * Class MountManager.
@@ -15,19 +15,19 @@ use League\Flysystem\Plugin\PluginNotFoundException;
  * @method AdapterInterface getAdapter($prefix)
  * @method Config getConfig($prefix)
  * @method bool has($path)
- * @method bool write($path, $contents, array $config = [])
- * @method bool writeStream($path, $resource, array $config = [])
- * @method bool put($path, $contents, $config = [])
- * @method bool putStream($path, $contents, $config = [])
+ * @method bool write($path, $contents, array $config = array())
+ * @method bool writeStream($path, $resource, array $config = array())
+ * @method bool put($path, $contents, $config = array())
+ * @method bool putStream($path, $contents, $config = array())
  * @method string readAndDelete($path)
- * @method bool update($path, $contents, $config = [])
- * @method bool updateStream($path, $resource, $config = [])
+ * @method bool update($path, $contents, $config = array())
+ * @method bool updateStream($path, $resource, $config = array())
  * @method string|false read($path)
  * @method resource|false readStream($path)
  * @method bool rename($path, $newpath)
  * @method bool delete($path)
  * @method bool deleteDir($dirname)
- * @method bool createDir($dirname, $config = [])
+ * @method bool createDir($dirname, $config = array())
  * @method array listFiles($directory = '', $recursive = false)
  * @method array listPaths($directory = '', $recursive = false)
  * @method array getWithMetadata($path, array $metadata)
@@ -45,12 +45,73 @@ use League\Flysystem\Plugin\PluginNotFoundException;
  */
 class MountManager
 {
-    use PluggableTrait;
+    /**
+     * @var array
+     */
+    protected $plugins = array();
+
+    /**
+     * Register a plugin.
+     *
+     * @param PluginInterface $plugin
+     *
+     * @throws LogicException
+     *
+     * @return $this
+     */
+    public function addPlugin(PluginInterface $plugin)
+    {
+        if ( ! method_exists($plugin, 'handle')) {
+            throw new LogicException(get_class($plugin) . ' does not have a handle method.');
+        }
+
+        $this->plugins[$plugin->getMethod()] = $plugin;
+
+        return $this;
+    }
+
+    /**
+     * Find a specific plugin.
+     *
+     * @param string $method
+     *
+     * @throws PluginNotFoundException
+     *
+     * @return PluginInterface
+     */
+    protected function findPlugin($method)
+    {
+        if ( ! isset($this->plugins[$method])) {
+            throw new PluginNotFoundException('Plugin not found for method: ' . $method);
+        }
+
+        return $this->plugins[$method];
+    }
+
+    /**
+     * Invoke a plugin by method name.
+     *
+     * @param string              $method
+     * @param array               $arguments
+     * @param FilesystemInterface $filesystem
+     *
+     * @throws PluginNotFoundException
+     *
+     * @return mixed
+     */
+    protected function invokePlugin($method, array $arguments, FilesystemInterface $filesystem)
+    {
+        $plugin = $this->findPlugin($method);
+        $plugin->setFilesystem($filesystem);
+        $callback = array($plugin, 'handle');
+
+        return call_user_func_array($callback, $arguments);
+    }
 
     /**
      * @var FilesystemInterface[]
      */
-    protected $filesystems = [];
+    protected $filesystems = array();
 
     /**
      * Constructor.
@@ -59,7 +120,7 @@ class MountManager
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(array $filesystems = [])
+    public function __construct(array $filesystems = array())
     {
         $this->mountFilesystems($filesystems);
     }
@@ -145,7 +206,7 @@ class MountManager
         list($prefix, $path) = $this->getPrefixAndPath($path);
         array_unshift($arguments, $path);
 
-        return [$prefix, $arguments];
+        return array($prefix, $arguments);
     }
 
     /**
@@ -198,7 +259,7 @@ class MountManager
      *
      * @return bool
      */
-    public function copy($from, $to, array $config = [])
+    public function copy($from, $to, array $config = array())
     {
         list($prefixFrom, $from) = $this->getPrefixAndPath($from);
 
@@ -231,10 +292,10 @@ class MountManager
      *
      * @return array
      */
-    public function listWith(array $keys = [], $directory = '', $recursive = false)
+    public function listWith(array $keys = array(), $directory = '', $recursive = false)
     {
         list($prefix, $directory) = $this->getPrefixAndPath($directory);
-        $arguments = [$keys, $directory, $recursive];
+        $arguments = array($keys, $directory, $recursive);
 
         return $this->invokePluginOnFilesystem('listWith', $arguments, $prefix);
     }
@@ -251,7 +312,7 @@ class MountManager
      *
      * @return bool
      */
-    public function move($from, $to, array $config = [])
+    public function move($from, $to, array $config = array())
     {
         list($prefixFrom, $pathFrom) = $this->getPrefixAndPath($from);
         list($prefixTo, $pathTo) = $this->getPrefixAndPath($to);
@@ -297,7 +358,7 @@ class MountManager
             // Let it pass, it's ok, don't panic.
         }
 
-        $callback = [$filesystem, $method];
+        $callback = array($filesystem, $method);
 
         return call_user_func_array($callback, $arguments);
     }

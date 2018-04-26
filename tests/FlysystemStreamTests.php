@@ -6,7 +6,35 @@ use Prophecy\Argument;
 
 class FlysystemStreamTests extends TestCase
 {
-    use \PHPUnitHacks;
+    /**
+     * @param string $exception
+     */
+    public function expectException($exception)
+    {
+        if (is_callable('parent::expectException')) {
+            return parent::expectException($exception);
+        }
+
+        parent::setExpectedException($exception);
+    }
+
+    /**
+     * Returns a test double for the specified class.
+     *
+     * @param string $originalClassName
+     *
+     * @return PHPUnit_Framework_MockObject_MockObject
+     *
+     * @throws PHPUnit_Framework_Exception
+     */
+    protected function createMock($originalClassName)
+    {
+        if (is_callable('parent::createMock')) {
+            return parent::createMock($originalClassName);
+        }
+
+        return $this->getMock($originalClassName);
+    }
 
     public function testWriteStream()
     {
@@ -14,7 +42,7 @@ class FlysystemStreamTests extends TestCase
         $adapter = $this->prophesize('League\Flysystem\AdapterInterface');
         $adapter->has('file.txt')->willReturn(false)->shouldBeCalled();
         $adapter->writeStream('file.txt', $stream, Argument::type('League\Flysystem\Config'))
-            ->willReturn(['path' => 'file.txt'], false)
+            ->willReturn(array('path' => 'file.txt'), false)
             ->shouldBeCalled();
         $filesystem = new Filesystem($adapter->reveal());
         $this->assertTrue($filesystem->writeStream('file.txt', $stream));
@@ -37,7 +65,7 @@ class FlysystemStreamTests extends TestCase
         $adapter->has('file.txt')->willReturn(true)->shouldBeCalled();
 
         $adapter->updateStream('file.txt', $stream, Argument::type('League\Flysystem\Config'))
-            ->willReturn(['path' => 'file.txt'], false)
+            ->willReturn(array('path' => 'file.txt'), false)
             ->shouldBeCalled();
 
         $filesystem = new Filesystem($adapter->reveal());
@@ -60,7 +88,7 @@ class FlysystemStreamTests extends TestCase
         $adapter = $this->prophesize('League\Flysystem\AdapterInterface');
         $adapter->has(Argument::type('string'))->willReturn(true)->shouldBeCalled();
         $stream = tmpfile();
-        $adapter->readStream('file.txt')->willReturn(['stream' => $stream])->shouldBeCalled();
+        $adapter->readStream('file.txt')->willReturn(array('stream' => $stream))->shouldBeCalled();
         $adapter->readStream('other.txt')->willReturn(false)->shouldBeCalled();
         $filesystem = new Filesystem($adapter->reveal());
         $this->assertInternalType('resource', $filesystem->readStream('file.txt'));

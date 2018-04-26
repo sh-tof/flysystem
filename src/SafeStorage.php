@@ -12,12 +12,12 @@ final class SafeStorage
     /**
      * @var array
      */
-    protected static $safeStorage = [];
+    protected static $safeStorage = array();
 
     public function __construct()
     {
         $this->hash = spl_object_hash($this);
-        static::$safeStorage[$this->hash] = [];
+        static::$safeStorage[$this->hash] = array();
     }
 
     public function storeSafely($key, $value)

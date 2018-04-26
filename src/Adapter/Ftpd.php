@@ -10,7 +10,7 @@ class Ftpd extends Ftp
     public function getMetadata($path)
     {
         if ($path === '') {
-            return ['type' => 'dir', 'path' => ''];
+            return array('type' => 'dir', 'path' => '');
         }
 
         if ( ! ($object = ftp_raw($this->getConnection(), 'STAT ' . $path)) || count($object) < 3) {
@@ -32,7 +32,7 @@ class Ftpd extends Ftp
         $listing = ftp_rawlist($this->getConnection(), $directory, $recursive);
 
         if ($listing === false || ( ! empty($listing) && substr($listing[0], 0, 5) === "ftpd:")) {
-            return [];
+            return array();
         }
 
         return $this->normalizeListing($listing, $directory);

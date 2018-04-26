@@ -8,10 +8,10 @@ use PHPUnit\Framework\TestCase;
 
 function ftp_systype($connection)
 {
-    static $connections = [
+    static $connections = array(
         'reconnect.me',
         'dont.reconnect.me',
-    ];
+    );
 
     if (is_string($connection) && array_key_exists($connection, $connections)) {
         $connections[$connection]++;
@@ -96,7 +96,8 @@ function ftp_chdir($connection, $directory)
         return false;
     }
 
-    if (in_array($directory, ['rawlist-total-0.txt', 'file1.txt', 'file2.txt', 'file3.txt', 'file4.txt', 'dir1', 'file1.with-total-line.txt', 'file1.with-invalid-line.txt'])) {
+    if (in_array($directory, array('rawlist-total-0.txt', 'file1.txt', 'file2.txt', 'file3.txt', 'file4.txt', 'dir1', 'file1.with-total-line.txt', 'file1.with-invalid-line.txt')
+    )) {
         return false;
     }
 
@@ -111,26 +112,26 @@ function ftp_pwd($connection)
 function ftp_raw($connection, $command)
 {
 	if ($command === 'OPTS UTF8 ON') {
-        return [0 => '200 UTF8 set to on'];
+        return array(0 => '200 UTF8 set to on');
     }
 
     if ($command === 'STAT syno.not.found') {
-        return [0 => '211- status of syno.not.found:', 1 => 'ftpd: assd: No such file or directory.' ,2 => '211 End of status'];
+        return array(0 => '211- status of syno.not.found:', 1 => 'ftpd: assd: No such file or directory.' ,2 => '211 End of status');
     }
 
     if ($command === 'syno.unknowndir') {
-        return [0 => '211- status of syno.unknowndir:', 1 => 'ftpd: assd: No such file or directory.' ,2 => '211 End of status'];
+        return array(0 => '211- status of syno.unknowndir:', 1 => 'ftpd: assd: No such file or directory.' ,2 => '211 End of status');
     }
 
     if (strpos($command, 'unknowndir') !== false) {
         return false;
     }
 
-    return [
+    return array(
         0 => '211-Status of somewhere/folder/dummy.txt:',
         1 => ' -rw-r--r-- 1 ftp ftp 0 Nov 24 13:59 somewhere/folder/dummy.txt',
         2 => '211 End of status'
-    ];
+    );
 }
 
 function ftp_rawlist($connection, $directory)
@@ -146,15 +147,15 @@ function ftp_rawlist($connection, $directory)
     }
 
     if (strpos($directory, 'recurse.manually/recurse.folder') !== false) {
-        return [
+        return array(
             '-rw-r--r--   1 ftp      ftp           409 Aug 19 09:01 file1.txt',
-        ];
+        );
     }
 
     if (strpos($directory, 'recurse.manually') !== false) {
-        return [
+        return array(
             'drwxr-xr-x   2 ftp      ftp          4096 Nov 24 13:59 recurse.folder',
-        ];
+        );
     }
 
     if (strpos($directory, 'recurse.folder') !== false) {
@@ -170,109 +171,109 @@ function ftp_rawlist($connection, $directory)
     }
 
     if ($directory === 'windows.not.found') {
-        return ["File not found"];
+        return array("File not found");
     }
 
     if (strpos($directory, 'file1.txt') !== false) {
-        return [
+        return array(
             '-rw-r--r--   1 ftp      ftp           409 Aug 19 09:01 file1.txt',
-        ];
+        );
     }
 
     if ($directory === '0') {
-        return [
+        return array(
             '-rw-r--r--   1 ftp      ftp           409 Aug 19 09:01 0',
-        ];
+        );
     }
 
     if (strpos($directory, 'file2.txt') !== false) {
-        return [
+        return array(
             '05-23-15  12:09PM                  684 file2.txt',
-        ];
+        );
     }
 
     if (strpos($directory, 'file3.txt') !== false) {
-        return [
+        return array(
             '06-09-2016  12:09PM                  684 file3.txt',
-        ];
+        );
     }
 
     if (strpos($directory, 'file4.txt') !== false) {
-        return [
+        return array(
             '2016-05-23  12:09PM                  684 file4.txt',
-        ];
+        );
     }
 
     if (strpos($directory, 'dir1') !== false) {
-        return [
+        return array(
             '2015-05-23  12:09       <DIR>          dir1',
-        ];
+        );
     }
 
     if (strpos($directory, 'rmdir.nested.fail') !== false) {
-        return [
+        return array(
             'drwxr-xr-x   2 ftp      ftp          4096 Oct 13  2012 .',
             'drwxr-xr-x   4 ftp      ftp          4096 Nov 24 13:58 ..',
             '-rw-r--r--   1 ftp      ftp           409 Oct 13  2012 rm.fail.txt',
-        ];
+        );
     }
 
     if (strpos($directory, 'lastfiledir') !== false) {
-        return [
+        return array(
             'drwxr-xr-x   2 ftp      ftp          4096 Feb  6  2012 .',
             'drwxr-xr-x   4 ftp      ftp          4096 Feb  6 13:58 ..',
             '-rw-r--r--   1 ftp      ftp           409 Aug 19 09:01 file1.txt',
             '-rw-r--r--   1 ftp      ftp           409 Aug 14 09:01 file2.txt',
             '-rw-r--r--   1 ftp      ftp           409 Feb  6 10:06 file3.txt',
             '-rw-r--r--   1 ftp      ftp           409 Mar 20  2014 file4.txt',
-        ];
+        );
     }
 
     if (strpos($directory, 'spaced.files') !== false) {
-        return [
+        return array(
             'drwxr-xr-x   2 ftp      ftp          4096 Feb  6  2012 .',
             'drwxr-xr-x   4 ftp      ftp          4096 Feb  6 13:58 ..',
             '-rw-r--r--   1 ftp      ftp           409 Aug 19 09:01  file1.txt',
 
-        ];
+        );
     }
 
     if (strpos($directory, 'file1.with-total-line.txt') !== false) {
-        return [
+        return array(
             'total 1',
             '-rw-r--r--   1 ftp      ftp           409 Aug 19 09:01 file1.txt',
-        ];
+        );
     }
 
     if (strpos($directory, 'rawlist-total-0.txt') !== false) {
-        return [
+        return array(
             'total 0',
-        ];
+        );
     }
 
     if (strpos($directory, 'file1.with-invalid-line.txt') !== false) {
-        return [
+        return array(
             'invalid line',
             '-rw-r--r--   1 ftp      ftp           409 Aug 19 09:01 file1.txt',
-        ];
+        );
     }
 
     if (strpos($directory, 'some.nested/rmdir.fail') !== false || strpos($directory, 'somewhere/cgi-bin') !== false) {
-        return [
+        return array(
             'drwxr-xr-x   2 ftp      ftp          4096 Oct 13  2012 .',
             'drwxr-xr-x   4 ftp      ftp          4096 Nov 24 13:58 ..',
-        ];
+        );
     }
 
     if (strpos($directory, 'some.nested') !== false) {
-        return ['drwxr-xr-x   1 ftp      ftp           409 Aug 19 09:01 rmdir.fail'];
+        return array('drwxr-xr-x   1 ftp      ftp           409 Aug 19 09:01 rmdir.fail');
     }
 
     if (strpos($directory, 'somewhere/folder') !== false) {
-        return ['-rw-r--r--   1 ftp      ftp             0 Nov 24 13:59 dummy.txt'];
+        return array('-rw-r--r--   1 ftp      ftp             0 Nov 24 13:59 dummy.txt');
     }
 
-    return [
+    return array(
         'drwxr-xr-x   4 ftp      ftp          4096 Nov 24 13:58 .',
         'drwxr-xr-x  16 ftp      ftp          4096 Sep  2 13:01 ..',
         'drwxr-xr-x   2 ftp      ftp          4096 Oct 13  2012 cgi-bin',
@@ -287,7 +288,7 @@ function ftp_rawlist($connection, $directory)
          'drwxr-xr-x   2 ftp      ftp          4096 Nov 24 13:59 .',
          'drwxr-xr-x   4 ftp      ftp          4096 Nov 24 13:58 ..',
          '-rw-r--r--   1 ftp      ftp             0 Nov 24 13:59 dummy.txt',
-    ];
+    );
 }
 
 function ftp_mdtm($connection, $path)
@@ -342,7 +343,7 @@ function ftp_fget($connection, $resource, $path)
 
 function ftp_nlist($connection, $directory)
 {
-    return ['./some.nested'];
+    return array('./some.nested');
 }
 
 function ftp_chmod($connection, $mode, $path)
@@ -359,9 +360,37 @@ function ftp_set_option($connection, $option, $value)
 
 class FtpTests extends TestCase
 {
-    use \PHPUnitHacks;
+    /**
+     * @param string $exception
+     */
+    public function expectException($exception)
+    {
+        if (is_callable('parent::expectException')) {
+            return parent::expectException($exception);
+        }
 
-    protected $options = [
+        parent::setExpectedException($exception);
+    }
+
+    /**
+     * Returns a test double for the specified class.
+     *
+     * @param string $originalClassName
+     *
+     * @return PHPUnit_Framework_MockObject_MockObject
+     *
+     * @throws PHPUnit_Framework_Exception
+     */
+    protected function createMock($originalClassName)
+    {
+        if (is_callable('parent::createMock')) {
+            return parent::createMock($originalClassName);
+        }
+
+        return $this->getMock($originalClassName);
+    }
+
+    protected $options = array(
         'host' => 'example.org',
         'port' => 40,
         'ssl' => true,
@@ -373,7 +402,7 @@ class FtpTests extends TestCase
         'username' => 'user',
         'password' => 'password',
         'recurseManually' => false,
-    ];
+    );
 
     public function setUp()
     {
@@ -401,8 +430,8 @@ class FtpTests extends TestCase
         $result = $adapter->getMimetype('something.txt');
         $this->assertEquals('text/plain', $result['mimetype']);
         $this->assertFalse($adapter->createDir('some.nested/mkdir.fail', new Config()));
-        $this->assertInternalType('array', $adapter->write('unknowndir/file.txt', 'contents', new Config(['visibility' => 'public'])));
-        $this->assertInternalType('array', $adapter->writeStream('unknowndir/file.txt', tmpfile(), new Config(['visibility' => 'public'])));
+        $this->assertInternalType('array', $adapter->write('unknowndir/file.txt', 'contents', new Config(array('*visibility' => 'public'))));
+        $this->assertInternalType('array', $adapter->writeStream('unknowndir/file.txt', tmpfile(), new Config(array('visibility' => 'public'))));
         $this->assertInternalType('array', $adapter->updateStream('unknowndir/file.txt', tmpfile(), new Config()));
         $this->assertInternalType('array', $adapter->getTimestamp('some/file.ext'));
     }
@@ -425,7 +454,7 @@ class FtpTests extends TestCase
      */
     public function testDisconnect()
     {
-        $adapter = new Ftp(array_merge($this->options, ['host' => 'disconnect.check']));
+        $adapter = new Ftp(array_merge($this->options, array('host' => 'disconnect.check')));
         $adapter->connect();
         $this->assertTrue($adapter->isConnected());
         $adapter->disconnect();
@@ -440,7 +469,7 @@ class FtpTests extends TestCase
         putenv('FTP_CLOSE_THROW=DISCONNECT_RETHROW');
 
         $this->expectException('ErrorException');
-        $adapter = new Ftp(array_merge($this->options, ['host' => 'disconnect.check']));
+        $adapter = new Ftp(array_merge($this->options, array('host' => 'disconnect.check')));
         $adapter->connect();
         $adapter->isConnected();
     }
@@ -452,7 +481,7 @@ class FtpTests extends TestCase
     {
         putenv('FTP_CLOSE_THROW=DISCONNECT_CATCH');
 
-        $adapter = new Ftp(array_merge($this->options, ['host' => 'disconnect.check']));
+        $adapter = new Ftp(array_merge($this->options, array('host' => 'disconnect.check')));
         $adapter->connect();
         $this->assertFalse($adapter->isConnected());
     }
@@ -467,7 +496,7 @@ class FtpTests extends TestCase
         }
 
         $this->assertFalse(getenv('USE_PASSV_ADDREESS' . FTP_USEPASVADDRESS));
-        $adapter = new Ftp(array_merge($this->options, ['ignorePassiveAddress' => true]));
+        $adapter = new Ftp(array_merge($this->options, array('ignorePassiveAddress' => true)));
         $adapter->connect();
         $this->assertEquals('NO', getenv('USE_PASSV_ADDREESS' . FTP_USEPASVADDRESS));
     }
@@ -479,7 +508,7 @@ class FtpTests extends TestCase
     {
         $adapter = new Ftp($this->options);
         $metadata = $adapter->getMetadata('');
-        $expected = ['type' => 'dir', 'path' => ''];
+        $expected = array('type' => 'dir', 'path' => '');
         $this->assertEquals($expected, $metadata);
     }
 
@@ -604,8 +633,10 @@ class FtpTests extends TestCase
 
         $last_modified_file = reset($listing);
         foreach ($listing as $file) {
-            $file_time = $adapter->getTimestamp($file['path'])['timestamp'];
-            $last_file_time = $adapter->getTimestamp($last_modified_file['path'])['timestamp'];
+            $file_time_tmp = $adapter->getTimestamp($file['path']);
+            $file_time = $file_time_tmp['timestamp'];
+            $last_file_time_tmp = $adapter->getTimestamp($last_modified_file['path']);
+            $last_file_time = $last_file_time_tmp['timestamp'];
 
             if ($last_file_time < $file_time) {
                 $last_modified_file = $file;
@@ -646,7 +677,7 @@ class FtpTests extends TestCase
      */
     public function testConnectFail()
     {
-        $adapter = new Ftp(['host' => 'fail.me', 'ssl' => false, 'transferMode' => FTP_BINARY]);
+        $adapter = new Ftp(array('host' => 'fail.me', 'ssl' => false, 'transferMode' => FTP_BINARY));
         $adapter->connect();
     }
 
@@ -657,7 +688,7 @@ class FtpTests extends TestCase
     {
         $adapter = new Ftp($this->options);
         $result = $adapter->listContents('fail.rawlist');
-        $this->assertEquals([], $result);
+        $this->assertEquals(array(), $result);
     }
 
     /**
@@ -666,7 +697,7 @@ class FtpTests extends TestCase
      */
     public function testConnectFailSsl()
     {
-        $adapter = new Ftp(['host' => 'fail.me', 'ssl' => true]);
+        $adapter = new Ftp(array('host' => 'fail.me', 'ssl' => true));
         $adapter->connect();
     }
 
@@ -676,7 +707,7 @@ class FtpTests extends TestCase
      */
     public function testLoginFailSsl()
     {
-        $adapter = new Ftp(['host' => 'login.fail', 'ssl' => true]);
+        $adapter = new Ftp(array('host' => 'login.fail', 'ssl' => true));
         $adapter->connect();
     }
 
@@ -686,7 +717,7 @@ class FtpTests extends TestCase
      */
     public function testRootFailSsl()
     {
-        $adapter = new Ftp(['host' => 'chdir.fail', 'ssl' => true, 'root' => 'somewhere']);
+        $adapter = new Ftp(array('host' => 'chdir.fail', 'ssl' => true, 'root' => 'somewhere'));
         $adapter->connect();
     }
 
@@ -696,7 +727,7 @@ class FtpTests extends TestCase
      */
     public function testPassiveFailSsl()
     {
-        $adapter = new Ftp(['host' => 'pasv.fail', 'ssl' => true, 'root' => 'somewhere']);
+        $adapter = new Ftp(array('host' => 'pasv.fail', 'ssl' => true, 'root' => 'somewhere'));
         $adapter->connect();
     }
 
@@ -705,7 +736,7 @@ class FtpTests extends TestCase
      */
     public function testItReconnects()
     {
-        $adapter = new Ftp(['host' => 'reconnect.me', 'ssl' => true, 'root' => 'somewhere']);
+        $adapter = new Ftp(array('host' => 'reconnect.me', 'ssl' => true, 'root' => 'somewhere'));
         $this->assertFalse($adapter->isConnected());
         $this->assertNotNull($adapter->getConnection());
     }
@@ -727,7 +758,7 @@ class FtpTests extends TestCase
      */
     public function testItThrowsAnExceptionWhenAnInvalidSystemTypeIsSet()
     {
-        $adapter = new Ftp($this->options + ['systemType' => 'unknown']);
+        $adapter = new Ftp($this->options + array('systemType' => 'unknown'));
         $adapter->listContents();
     }
 
@@ -737,7 +768,7 @@ class FtpTests extends TestCase
      */
     public function testItThrowsAnExceptionWhenAnInvalidUnixListingIsFound()
     {
-        $adapter = new Ftp($this->options + ['systemType' => 'unix']);
+        $adapter = new Ftp($this->options + array('systemType' => 'unix'));
         $metadata = $adapter->getMetadata('file1.with-invalid-line.txt');
         $this->assertEquals('file1.txt', $metadata['path']);
     }
@@ -747,7 +778,7 @@ class FtpTests extends TestCase
      */
     public function testReadFailure()
     {
-        $adapter = new Ftp($this->options + ['systemType' => 'unix']);
+        $adapter = new Ftp($this->options + array('systemType' => 'unix'));
         $this->assertFalse($adapter->read('not.found'));
     }
 
@@ -757,7 +788,7 @@ class FtpTests extends TestCase
      */
     public function testItThrowsAnExceptionWhenAnInvalidWindowsListingIsFound()
     {
-        $adapter = new Ftp($this->options + ['systemType' => 'windows']);
+        $adapter = new Ftp($this->options + array('systemType' => 'windows'));
         $metadata = $adapter->getMetadata('file1.with-invalid-line.txt');
         $this->assertEquals('file1.txt', $metadata['path']);
     }

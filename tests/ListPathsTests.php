@@ -5,7 +5,35 @@ use PHPUnit\Framework\TestCase;
 
 class ListPathsTests extends TestCase
 {
-    use \PHPUnitHacks;
+    /**
+     * @param string $exception
+     */
+    public function expectException($exception)
+    {
+        if (is_callable('parent::expectException')) {
+            return parent::expectException($exception);
+        }
+
+        parent::setExpectedException($exception);
+    }
+
+    /**
+     * Returns a test double for the specified class.
+     *
+     * @param string $originalClassName
+     *
+     * @return PHPUnit_Framework_MockObject_MockObject
+     *
+     * @throws PHPUnit_Framework_Exception
+     */
+    protected function createMock($originalClassName)
+    {
+        if (is_callable('parent::createMock')) {
+            return parent::createMock($originalClassName);
+        }
+
+        return $this->getMock($originalClassName);
+    }
 
     private $filesystem;
     private $actualFilesystem;
@@ -23,11 +51,11 @@ class ListPathsTests extends TestCase
     {
         $plugin = new ListPaths();
         $this->assertEquals('listPaths', $plugin->getMethod());
-        $this->filesystem->listContents('dirname', true)->willReturn([
-            ['path' => 'dirname/path.txt'],
-        ]);
+        $this->filesystem->listContents('dirname', true)->willReturn(array(
+            array('path' => 'dirname/path.txt'),
+        ));
         $plugin->setFilesystem($this->actualFilesystem);
         $output = $plugin->handle('dirname', true);
-        $this->assertEquals(['dirname/path.txt'], $output);
+        $this->assertEquals(array('dirname/path.txt'), $output);
     }
 }

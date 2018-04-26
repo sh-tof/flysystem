@@ -6,7 +6,35 @@ use PHPUnit\Framework\TestCase;
 
 class HandlerTests extends TestCase
 {
-    use \PHPUnitHacks;
+    /**
+     * @param string $exception
+     */
+    public function expectException($exception)
+    {
+        if (is_callable('parent::expectException')) {
+            return parent::expectException($exception);
+        }
+
+        parent::setExpectedException($exception);
+    }
+
+    /**
+     * Returns a test double for the specified class.
+     *
+     * @param string $originalClassName
+     *
+     * @return PHPUnit_Framework_MockObject_MockObject
+     *
+     * @throws PHPUnit_Framework_Exception
+     */
+    protected function createMock($originalClassName)
+    {
+        if (is_callable('parent::createMock')) {
+            return parent::createMock($originalClassName);
+        }
+
+        return $this->getMock($originalClassName);
+    }
 
     public function testFileRead()
     {
@@ -65,13 +93,13 @@ class HandlerTests extends TestCase
 
     public function getterProvider()
     {
-        return [
-            ['getTimestamp', 123],
-            ['getMimetype', 'text/plain'],
-            ['getVisibility', 'private'],
-            ['getMetadata', ['some' => 'metadata']],
-            ['getSize', 123],
-        ];
+        return array(
+            array('getTimestamp', 123),
+            array('getMimetype', 'text/plain'),
+            array('getVisibility', 'private'),
+            array('getMetadata', array('some' => 'metadata')),
+            array('getSize', 123),
+        );
     }
 
     /**
@@ -93,7 +121,7 @@ class HandlerTests extends TestCase
 
     public function testFileIsFile()
     {
-        $response = ['type' => 'file'];
+        $response = array('type' => 'file');
         $prophecy = $this->prophesize('League\Flysystem\FilesystemInterface');
         $prophecy->getMetadata('path.txt')->willReturn($response);
         $filesystem = $prophecy->reveal();
@@ -104,7 +132,7 @@ class HandlerTests extends TestCase
 
     public function testFileIsDir()
     {
-        $response = ['type' => 'file'];
+        $response = array('type' => 'file');
         $prophecy = $this->prophesize('League\Flysystem\FilesystemInterface');
         $prophecy->getMetadata('path.txt')->willReturn($response);
         $filesystem = $prophecy->reveal();
@@ -135,7 +163,7 @@ class HandlerTests extends TestCase
     public function testDirListContents()
     {
         $prophecy = $this->prophesize('League\Flysystem\FilesystemInterface');
-        $prophecy->listContents('path', true)->willReturn($listing = ['listing']);
+        $prophecy->listContents('path', true)->willReturn($listing = array('listing'));
         $filesystem = $prophecy->reveal();
         $dir = new Directory(null, 'path');
         $dir->setFilesystem($filesystem);

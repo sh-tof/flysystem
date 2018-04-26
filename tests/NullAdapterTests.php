@@ -7,7 +7,35 @@ use PHPUnit\Framework\TestCase;
 
 class NullAdapterTest extends TestCase
 {
-    use \PHPUnitHacks;
+    /**
+     * @param string $exception
+     */
+    public function expectException($exception)
+    {
+        if (is_callable('parent::expectException')) {
+            return parent::expectException($exception);
+        }
+
+        parent::setExpectedException($exception);
+    }
+
+    /**
+     * Returns a test double for the specified class.
+     *
+     * @param string $originalClassName
+     *
+     * @return PHPUnit_Framework_MockObject_MockObject
+     *
+     * @throws PHPUnit_Framework_Exception
+     */
+    protected function createMock($originalClassName)
+    {
+        if (is_callable('parent::createMock')) {
+            return parent::createMock($originalClassName);
+        }
+
+        return $this->getMock($originalClassName);
+    }
 
     /**
      * @return Filesystem
@@ -53,20 +81,20 @@ class NullAdapterTest extends TestCase
 
     public function expectedFailsProvider()
     {
-        return [
-            ['read'],
-            ['update'],
-            ['read'],
-            ['rename'],
-            ['delete'],
-            ['listContents', []],
-            ['getMetadata'],
-            ['getSize'],
-            ['getMimetype'],
-            ['getTimestamp'],
-            ['getVisibility'],
-            ['deleteDir'],
-        ];
+        return array(
+            array('read'),
+            array('update'),
+            array('read'),
+            array('rename'),
+            array('delete'),
+            array('listContents', array()),
+            array('getMetadata'),
+            array('getSize'),
+            array('getMimetype'),
+            array('getTimestamp'),
+            array('getVisibility'),
+            array('deleteDir'),
+        );
     }
 
     /**
@@ -80,10 +108,10 @@ class NullAdapterTest extends TestCase
 
     public function expectedArrayResultProvider()
     {
-        return [
-            ['write'],
-            ['setVisibility'],
-        ];
+        return array(
+            array('write'),
+            array('setVisibility'),
+        );
     }
 
     /**
@@ -92,12 +120,12 @@ class NullAdapterTest extends TestCase
     public function testArrayResult($method)
     {
         $adapter = new NullAdapter();
-        $this->assertInternalType('array', $adapter->{$method}('one', tmpfile(), new Config(['visibility' => 'public'])));
+        $this->assertInternalType('array', $adapter->{$method}('one', tmpfile(), new Config(array('visibility' => 'public'))));
     }
 
     public function testArrayResultForCreateDir()
     {
         $adapter = new NullAdapter();
-        $this->assertInternalType('array', $adapter->createDir('one', new Config(['visibility' => 'public'])));
+        $this->assertInternalType('array', $adapter->createDir('one', new Config(array('visibility' => 'public'))));
     }
 }

@@ -16,7 +16,6 @@ return Symfony\CS\Config\Config::create()
         'phpdoc_type_to_var',
         'operators_spaces',
         'ordered_use',
-        'short_array_syntax',
         'return',
         'spaces_before_semicolon',
         'spaces_cast',

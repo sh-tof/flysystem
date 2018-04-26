@@ -64,7 +64,7 @@ abstract class AbstractFtpAdapter extends AbstractAdapter
     /**
      * @var array
      */
-    protected $configurable = [];
+    protected $configurable = array();
 
     /**
      * @var string
@@ -335,7 +335,7 @@ abstract class AbstractFtpAdapter extends AbstractAdapter
     protected function normalizeListing(array $listing, $prefix = '')
     {
         $base = $prefix;
-        $result = [];
+        $result = array();
         $listing = $this->removeDotDirectories($listing);
 
         while ($item = array_shift($listing)) {
@@ -496,7 +496,7 @@ abstract class AbstractFtpAdapter extends AbstractAdapter
         $permissions = substr($permissions, 1);
 
         // map the string rights to the numeric counterparts
-        $map = ['-' => '0', 'r' => '4', 'w' => '2', 'x' => '1'];
+        $map = array('-' => '0', 'r' => '4', 'w' => '2', 'x' => '1');
         $permissions = strtr($permissions, $map);
 
         // split up the permission groups

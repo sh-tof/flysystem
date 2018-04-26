@@ -93,7 +93,7 @@ abstract class FtpIntegrationTestCase extends TestCase
         $filesystem->write('dirname/b/b.txt', 'contents');
         $filesystem->write('dirname/c.txt', 'contents');
         $files = $filesystem->listPaths('', true);
-        $expected = ['dirname', 'dirname/a.txt', 'dirname/b', 'dirname/b/b.txt', 'dirname/c.txt'];
+        $expected = array('dirname', 'dirname/a.txt', 'dirname/b', 'dirname/b/b.txt', 'dirname/c.txt');
         $filesystem->deleteDir('dirname');
         $this->assertEquals($expected, $files);
     }

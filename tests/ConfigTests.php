@@ -5,7 +5,35 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigTests extends TestCase
 {
-    use \PHPUnitHacks;
+    /**
+     * @param string $exception
+     */
+    public function expectException($exception)
+    {
+        if (is_callable('parent::expectException')) {
+            return parent::expectException($exception);
+        }
+
+        parent::setExpectedException($exception);
+    }
+
+    /**
+     * Returns a test double for the specified class.
+     *
+     * @param string $originalClassName
+     *
+     * @return PHPUnit_Framework_MockObject_MockObject
+     *
+     * @throws PHPUnit_Framework_Exception
+     */
+    protected function createMock($originalClassName)
+    {
+        if (is_callable('parent::createMock')) {
+            return parent::createMock($originalClassName);
+        }
+
+        return $this->getMock($originalClassName);
+    }
 
     public function testGet()
     {
@@ -14,7 +42,7 @@ class ConfigTests extends TestCase
         $this->assertNull($config->get('setting'));
         $config->set('setting', 'value');
         $this->assertEquals('value', $config->get('setting'));
-        $fallback = new Config(['fallback_setting' => 'fallback_value']);
+        $fallback = new Config(array('fallback_setting' => 'fallback_value'));
         $config->setFallback($fallback);
         $this->assertEquals('fallback_value', $config->get('fallback_setting'));
     }
@@ -22,7 +50,7 @@ class ConfigTests extends TestCase
     public function testFallingBackWhenCallingHas()
     {
         $config = new Config();
-        $fallback = new Config(['setting_name' => true]);
+        $fallback = new Config(array('setting_name' => true));
         $config->setFallback($fallback);
 
         $this->assertTrue($config->has('setting_name'));

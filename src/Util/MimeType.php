@@ -71,7 +71,7 @@ class MimeType
      */
     public static function getExtensionToMimeTypeMap()
     {
-        return [
+        return array(
             'hqx'   => 'application/mac-binhex40',
             'cpt'   => 'application/mac-compactpro',
             'csv'   => 'text/x-comma-separated-values',
@@ -227,6 +227,6 @@ class MimeType
             'odm'   => 'application/vnd.oasis.opendocument.text-master',
             'odb'   => 'application/vnd.oasis.opendocument.database',
             'ott'   => 'application/vnd.oasis.opendocument.text-template',
-        ];
+        );
     }
 }

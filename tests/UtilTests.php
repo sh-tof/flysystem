@@ -6,15 +6,43 @@ use PHPUnit\Framework\TestCase;
 
 class UtilTests extends TestCase
 {
-    use \PHPUnitHacks;
+    /**
+     * @param string $exception
+     */
+    public function expectException($exception)
+    {
+        if (is_callable('parent::expectException')) {
+            return parent::expectException($exception);
+        }
+
+        parent::setExpectedException($exception);
+    }
+
+    /**
+     * Returns a test double for the specified class.
+     *
+     * @param string $originalClassName
+     *
+     * @return PHPUnit_Framework_MockObject_MockObject
+     *
+     * @throws PHPUnit_Framework_Exception
+     */
+    protected function createMock($originalClassName)
+    {
+        if (is_callable('parent::createMock')) {
+            return parent::createMock($originalClassName);
+        }
+
+        return $this->getMock($originalClassName);
+    }
 
     public function testEmulateDirectories()
     {
-        $input = [
-            ['dirname' => '', 'filename' => 'dummy', 'path' => 'dummy', 'type' => 'file'],
-            ['dirname' => 'something', 'filename' => 'dummy', 'path' => 'something/dummy', 'type' => 'file'],
-            ['dirname' => 'something', 'path' => 'something/dirname', 'type' => 'dir'],
-        ];
+        $input = array(
+            array('dirname' => '', 'filename' => 'dummy', 'path' => 'dummy', 'type' => 'file'),
+            array('dirname' => 'something', 'filename' => 'dummy', 'path' => 'something/dummy', 'type' => 'file'),
+            array('dirname' => 'something', 'path' => 'something/dirname', 'type' => 'dir'),
+        );
         $output = Util::emulateDirectories($input);
         $this->assertCount(4, $output);
     }
@@ -27,10 +55,10 @@ class UtilTests extends TestCase
 
     public function mapProvider()
     {
-        return [
-            [['from.this' => 'value'], ['from.this' => 'to.this', 'other' => 'other'], ['to.this' => 'value']],
-            [['from.this' => 'value', 'no.mapping' => 'lost'], ['from.this' => 'to.this'], ['to.this' => 'value']],
-        ];
+        return array(
+            array(array('from.this' => 'value'), array('from.this' => 'to.this', 'other' => 'other'), array('to.this' => 'value')),
+            array(array('from.this' => 'value', 'no.mapping' => 'lost'), array('from.this' => 'to.this'), array('to.this' => 'value')),
+        );
     }
 
     /**
@@ -44,11 +72,11 @@ class UtilTests extends TestCase
 
     public function dirnameProvider()
     {
-        return [
-            ['filename.txt', ''],
-            ['dirname/filename.txt', 'dirname'],
-            ['dirname/subdir', 'dirname'],
-        ];
+        return array(
+            array('filename.txt', ''),
+            array('dirname/filename.txt', 'dirname'),
+            array('dirname/subdir', 'dirname'),
+        );
     }
 
     /**
@@ -62,7 +90,7 @@ class UtilTests extends TestCase
 
     public function testEnsureConfig()
     {
-        $this->assertInstanceOf('League\Flysystem\Config', Util::ensureConfig([]));
+        $this->assertInstanceOf('League\Flysystem\Config', Util::ensureConfig(array()));
         $this->assertInstanceOf('League\Flysystem\Config', Util::ensureConfig(null));
         $this->assertInstanceOf('League\Flysystem\Config', Util::ensureConfig(new Config()));
     }
@@ -77,13 +105,13 @@ class UtilTests extends TestCase
 
     public function invalidPathProvider()
     {
-        return [
-            ['something/../../../hehe'],
-            ['/something/../../..'],
-            ['..'],
-            ['something\\..\\..'],
-            ['\\something\\..\\..\\dirname'],
-        ];
+        return array(
+            array('something/../../../hehe'),
+            array('/something/../../..'),
+            array('..'),
+            array('something\\..\\..'),
+            array('\\something\\..\\..\\dirname'),
+        );
     }
 
     /**
@@ -97,28 +125,28 @@ class UtilTests extends TestCase
 
     public function pathProvider()
     {
-        return [
-            ['.', ''],
-            ['/path/to/dir/.', 'path/to/dir'],
-            ['/dirname/', 'dirname'],
-            ['dirname/..', ''],
-            ['dirname/../', ''],
-            ['dirname./', 'dirname.'],
-            ['dirname/./', 'dirname'],
-            ['dirname/.', 'dirname'],
-            ['./dir/../././', ''],
-            ['/something/deep/../../dirname', 'dirname'],
-            ['00004869/files/other/10-75..stl', '00004869/files/other/10-75..stl'],
-            ['/dirname//subdir///subsubdir', 'dirname/subdir/subsubdir'],
-            ['\dirname\\\\subdir\\\\\\subsubdir', 'dirname/subdir/subsubdir'],
-            ['\\\\some\shared\\\\drive', 'some/shared/drive'],
-            ['C:\dirname\\\\subdir\\\\\\subsubdir', 'C:/dirname/subdir/subsubdir'],
-            ['C:\\\\dirname\subdir\\\\subsubdir', 'C:/dirname/subdir/subsubdir'],
-            ['example/path/..txt', 'example/path/..txt'],
-            ['\\example\\path.txt', 'example/path.txt'],
-            ['\\example\\..\\path.txt', 'path.txt'],
-            ["some\0/path.txt", 'some/path.txt'],
-        ];
+        return array(
+            array('.', ''),
+            array('/path/to/dir/.', 'path/to/dir'),
+            array('/dirname/', 'dirname'),
+            array('dirname/..', ''),
+            array('dirname/../', ''),
+            array('dirname./', 'dirname.'),
+            array('dirname/./', 'dirname'),
+            array('dirname/.', 'dirname'),
+            array('./dir/../././', ''),
+            array('/something/deep/../../dirname', 'dirname'),
+            array('00004869/files/other/10-75..stl', '00004869/files/other/10-75..stl'),
+            array('/dirname//subdir///subsubdir', 'dirname/subdir/subsubdir'),
+            array('\dirname\\\\subdir\\\\\\subsubdir', 'dirname/subdir/subsubdir'),
+            array('\\\\some\shared\\\\drive', 'some/shared/drive'),
+            array('C:\dirname\\\\subdir\\\\\\subsubdir', 'C:/dirname/subdir/subsubdir'),
+            array('C:\\\\dirname\subdir\\\\subsubdir', 'C:/dirname/subdir/subsubdir'),
+            array('example/path/..txt', 'example/path/..txt'),
+            array('\\example\\path.txt', 'example/path.txt'),
+            array('\\example\\..\\path.txt', 'path.txt'),
+            array("some\0/path.txt", 'some/path.txt'),
+        );
     }
 
     /**
@@ -134,12 +162,12 @@ class UtilTests extends TestCase
 
     public function pathAndContentProvider()
     {
-        return [
-            ['/some/file.css', '.event { background: #000; } ', 'text/css'],
-            ['/some/file.css', 'body { background: #000; } ', 'text/css'],
-            ['/some/file.txt', 'body { background: #000; } ', 'text/plain'],
-            ['/1x1', base64_decode('R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='), 'image/gif'],
-        ];
+        return array(
+            array('/some/file.css', '.event { background: #000; } ', 'text/css'),
+            array('/some/file.css', 'body { background: #000; } ', 'text/css'),
+            array('/some/file.txt', 'body { background: #000; } ', 'text/plain'),
+            array('/1x1', base64_decode('R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='), 'image/gif'),
+        );
     }
 
     /**
@@ -178,51 +206,51 @@ class UtilTests extends TestCase
 
     public function pathinfoPathProvider()
     {
-        return [
-            [''],
-            ['.'],
-            ['..'],
-            ['...'],
-            ['/.'],
-            ['//.'],
-            ['///.'],
+        return array(
+            array(''),
+            array('.'),
+            array('..'),
+            array('...'),
+            array('/.'),
+            array('//.'),
+            array('///.'),
 
-            ['foo'],
-            ['/foo'],
-            ['/foo/bar'],
-            ['/foo/bar/'],
+            array('foo'),
+            array('/foo'),
+            array('/foo/bar'),
+            array('/foo/bar/'),
 
-            ['file.txt'],
-            ['foo/file.txt'],
-            ['/foo/file.jpeg'],
+            array('file.txt'),
+            array('foo/file.txt'),
+            array('/foo/file.jpeg'),
 
-            ['.txt'],
-            ['dir/.txt'],
-            ['/dir/.txt'],
+            array('.txt'),
+            array('dir/.txt'),
+            array('/dir/.txt'),
 
-            ['foo/bar.'],
-            ['foo/bar..'],
-            ['foo/bar/.'],
+            array('foo/bar.'),
+            array('foo/bar..'),
+            array('foo/bar/.'),
 
-            ['c:'],
-            ['c:\\'],
-            ['c:/'],
-            ['c:file'],
-            ['c:f:ile'],
-            ['c:f:'],
-            ['c:d:e:'],
-            ['AB:file'],
-            ['AB:'],
-            ['d:\foo\bar'],
-            ['E:\foo\bar\\'],
-            ['f:\foo\bar:baz'],
-            ['G:\foo\bar:'],
-            ['c:/foo/bar'],
-            ['c:/foo/bar/'],
-            ['Y:\foo\bar.txt'],
-            ['z:\foo\bar.'],
-            ['foo\bar'],
-        ];
+            array('c:'),
+            array('c:\\'),
+            array('c:/'),
+            array('c:file'),
+            array('c:f:ile'),
+            array('c:f:'),
+            array('c:d:e:'),
+            array('AB:file'),
+            array('AB:'),
+            array('d:\foo\bar'),
+            array('E:\foo\bar\\'),
+            array('f:\foo\bar:baz'),
+            array('G:\foo\bar:'),
+            array('c:/foo/bar'),
+            array('c:/foo/bar/'),
+            array('Y:\foo\bar.txt'),
+            array('z:\foo\bar.'),
+            array('foo\bar'),
+        );
     }
 
     /**
@@ -242,53 +270,53 @@ class UtilTests extends TestCase
     public function testPathinfoHandlesUtf8()
     {
         $path = 'files/繁體中文字/test.txt';
-        $expected = [
+        $expected = array(
             'path' => 'files/繁體中文字/test.txt',
             'dirname' => 'files/繁體中文字',
             'basename' => 'test.txt',
             'extension' => 'txt',
             'filename' => 'test',
-        ];
+        );
         $this->assertSame($expected, Util::pathinfo($path));
 
         $path = 'files/繁體中文字.txt';
-        $expected = [
+        $expected = array(
             'path' => 'files/繁體中文字.txt',
             'dirname' => 'files',
             'basename' => '繁體中文字.txt',
             'extension' => 'txt',
             'filename' => '繁體中文字',
-        ];
+        );
         $this->assertSame($expected, Util::pathinfo($path));
 
         $path = '👨‍👩‍👧‍👦👨‍👩‍👦‍👦👨‍👩‍👧‍👧/繁體中文字.txt';
-        $expected = [
+        $expected = array(
             'path' => '👨‍👩‍👧‍👦👨‍👩‍👦‍👦👨‍👩‍👧‍👧/繁體中文字.txt',
             'dirname' => '👨‍👩‍👧‍👦👨‍👩‍👦‍👦👨‍👩‍👧‍👧',
             'basename' => '繁體中文字.txt',
             'extension' => 'txt',
             'filename' => '繁體中文字',
-        ];
+        );
         $this->assertSame($expected, Util::pathinfo($path));
 
         $path = 'foo/bar.baz.😀😬😁';
-        $expected = [
+        $expected = array(
             'path' => 'foo/bar.baz.😀😬😁',
             'dirname' => 'foo',
             'basename' => 'bar.baz.😀😬😁',
             'extension' => '😀😬😁',
             'filename' => 'bar.baz',
-        ];
+        );
         $this->assertSame($expected, Util::pathinfo($path));
 
         $path = '繁體中文字/👨‍👩‍👧‍👦.😺😸😹😻.😀😬😁';
-        $expected = [
+        $expected = array(
             'path' => '繁體中文字/👨‍👩‍👧‍👦.😺😸😹😻.😀😬😁',
             'dirname' => '繁體中文字',
             'basename' => '👨‍👩‍👧‍👦.😺😸😹😻.😀😬😁',
             'extension' => '😀😬😁',
             'filename' => '👨‍👩‍👧‍👦.😺😸😹😻',
-        ];
+        );
         $this->assertSame($expected, Util::pathinfo($path));
     }
 }

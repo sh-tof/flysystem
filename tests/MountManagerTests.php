@@ -6,7 +6,35 @@ use Prophecy\Argument;
 
 class MountManagerTests extends TestCase
 {
-    use \PHPUnitHacks;
+    /**
+     * @param string $exception
+     */
+    public function expectException($exception)
+    {
+        if (is_callable('parent::expectException')) {
+            return parent::expectException($exception);
+        }
+
+        parent::setExpectedException($exception);
+    }
+
+    /**
+     * Returns a test double for the specified class.
+     *
+     * @param string $originalClassName
+     *
+     * @return PHPUnit_Framework_MockObject_MockObject
+     *
+     * @throws PHPUnit_Framework_Exception
+     */
+    protected function createMock($originalClassName)
+    {
+        if (is_callable('parent::createMock')) {
+            return parent::createMock($originalClassName);
+        }
+
+        return $this->getMock($originalClassName);
+    }
 
     public function testInstantiable()
     {
@@ -16,9 +44,9 @@ class MountManagerTests extends TestCase
     public function testConstructorInjection()
     {
         $mock = $this->createMock('League\Flysystem\FilesystemInterface');
-        $manager = new MountManager([
+        $manager = new MountManager(array(
             'prefix' => $mock,
-        ]);
+        ));
         $this->assertEquals($mock, $manager->getFilesystem('prefix'));
     }
 
@@ -42,11 +70,11 @@ class MountManagerTests extends TestCase
 
     public function invalidCallProvider()
     {
-        return [
-            [[], 'LogicException'],
-            [[false], 'InvalidArgumentException'],
-            [['path/without/protocol'], 'InvalidArgumentException'],
-        ];
+        return array(
+            array(array(), 'LogicException'),
+            array(array(false), 'InvalidArgumentException'),
+            array(array('path/without/protocol'), 'InvalidArgumentException'),
+        );
     }
 
     /**
@@ -65,7 +93,7 @@ class MountManagerTests extends TestCase
         $mock = $this->getMockBuilder('League\Flysystem\Filesystem')->disableOriginalConstructor()->getMock();
         $mock->expects($this->once())
             ->method('__call')
-            ->with('aMethodCall', ['file.ext'])
+            ->with('aMethodCall', array('file.ext'))
             ->willReturn('a result');
         $manager->mountFilesystem('prot', $mock);
         $this->assertEquals($manager->aMethodCall('prot://file.ext'), 'a result');
@@ -82,7 +110,7 @@ class MountManagerTests extends TestCase
         $filename = 'test1.txt';
         $buffer = tmpfile();
         $fs1->readStream($filename)->willReturn($buffer)->shouldBeCalledTimes(1);
-        $fs2->writeStream($filename, $buffer, [])->willReturn(true)->shouldBeCalledTimes(1);
+        $fs2->writeStream($filename, $buffer, array())->willReturn(true)->shouldBeCalledTimes(1);
         $response = $manager->copy("fs1://{$filename}", "fs2://{$filename}");
         $this->assertTrue($response);
 
@@ -94,13 +122,13 @@ class MountManagerTests extends TestCase
 
         $filename = 'test3.txt';
         $fs1->readStream($filename)->willReturn($buffer)->shouldBeCalledTimes(1);
-        $fs2->writeStream($filename, $buffer, [])->willReturn(false)->shouldBeCalledTimes(1);
+        $fs2->writeStream($filename, $buffer, array())->willReturn(false)->shouldBeCalledTimes(1);
         $status = $manager->copy("fs1://{$filename}", "fs2://{$filename}");
         $this->assertFalse($status);
 
         $filename = 'test4.txt';
         $fs1->readStream($filename)->willReturn($buffer)->shouldBeCalledTimes(1);
-        $fs2->writeStream($filename, $buffer, [])->willReturn(true)->shouldBeCalledTimes(1);
+        $fs2->writeStream($filename, $buffer, array())->willReturn(true)->shouldBeCalledTimes(1);
         $status = $manager->copy("fs1://{$filename}", "fs2://{$filename}");
         $this->assertTrue($status);
     }
@@ -108,7 +136,7 @@ class MountManagerTests extends TestCase
     public function testMoveBetweenFilesystems()
     {
         $manager = $this->getMockBuilder('League\Flysystem\MountManager')
-            ->setMethods(['copy', 'delete'])
+            ->setMethods(array('copy', 'delete'))
             ->getMock();
         $fs1 = $this->prophesize('League\Flysystem\FilesystemInterface');
         $fs2 = $this->prophesize('League\Flysystem\FilesystemInterface');
@@ -118,11 +146,11 @@ class MountManagerTests extends TestCase
         $filename = 'test.txt';
         $buffer = tmpfile();
         $fs1->readStream($filename)->willReturn($buffer);
-        $fs2->writeStream($filename, $buffer, [])->willReturn(false);
+        $fs2->writeStream($filename, $buffer, array())->willReturn(false);
         $code = $manager->move("fs1://{$filename}", "fs2://{$filename}");
         $this->assertFalse($code);
 
-        $manager->method('copy')->with("fs1://{$filename}", "fs2://{$filename}", [])->willReturn(true);
+        $manager->method('copy')->with("fs1://{$filename}", "fs2://{$filename}", array())->willReturn(true);
         $manager->method('delete')->with("fs1://{$filename}")->willReturn(true);
         $code = $manager->move("fs1://{$filename}", "fs2://{$filename}");
 
@@ -135,7 +163,7 @@ class MountManagerTests extends TestCase
         $fs = $this->prophesize('League\Flysystem\FilesystemInterface');
         $manager->mountFilesystem('fs1', $fs->reveal());
 
-        $config = ['visibility' => 'private'];
+        $config = array('visibility' => 'private');
         $fs->rename('old.txt', 'new.txt')->willReturn(true);
         $fs->setVisibility('new.txt', 'private')->willReturn(true);
 
@@ -146,10 +174,10 @@ class MountManagerTests extends TestCase
     protected function mockFilesystem()
     {
         $mock = $this->prophesize('League\Flysystem\FilesystemInterface');
-        $mock->listContents(Argument::type('string'), false)->willReturn([
-           ['path' => 'path.txt', 'type' => 'file'],
-           ['path' => 'dirname/path.txt', 'type' => 'file'],
-        ]);
+        $mock->listContents(Argument::type('string'), false)->willReturn(array(
+           array('path' => 'path.txt', 'type' => 'file'),
+           array('path' => 'dirname/path.txt', 'type' => 'file'),
+        ));
 
         return $mock->reveal();
     }
@@ -179,16 +207,16 @@ class MountManagerTests extends TestCase
     public function testListWith()
     {
         $manager = new MountManager();
-        $response = ['path' => 'file.ext', 'timestamp' => time()];
+        $response = array('path' => 'file.ext', 'timestamp' => time());
         $mock = $this->getMockBuilder('League\Flysystem\Filesystem')->disableOriginalConstructor()->getMock();
-        $mock->method('__call')->with('listWith', [['timestamp'], 'file.ext', false])->willReturn($response);
+        $mock->method('__call')->with('listWith', array(array('timestamp'), 'file.ext', false))->willReturn($response);
         $manager->mountFilesystem('prot', $mock);
-        $this->assertEquals($response, $manager->listWith(['timestamp'], 'prot://file.ext', false));
+        $this->assertEquals($response, $manager->listWith(array('timestamp'), 'prot://file.ext', false));
     }
 
     public function provideMountSchemas()
     {
-        return [['with.dot'], ['with-dash'], ['with+plus'], ['with:colon']];
+        return array(array('with.dot'), array('with-dash'), array('with+plus'), array('with:colon'));
     }
 
     /**
@@ -198,7 +226,7 @@ class MountManagerTests extends TestCase
     {
         $manager = new MountManager();
         $mock = $this->getMockBuilder('League\Flysystem\Filesystem')->disableOriginalConstructor()->getMock();
-        $mock->method('__call')->with('aMethodCall', ['file.ext'])->willReturn('a result');
+        $mock->method('__call')->with('aMethodCall', array('file.ext'))->willReturn('a result');
         $manager->mountFilesystem($schema, $mock);
         $this->assertEquals($manager->aMethodCall($schema . '://file.ext'), 'a result');
     }

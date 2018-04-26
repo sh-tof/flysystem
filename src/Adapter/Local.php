@@ -31,16 +31,16 @@ class Local extends AbstractAdapter
     /**
      * @var array
      */
-    protected static $permissions = [
-        'file' => [
+    protected static $permissions = array(
+        'file' => array(
             'public' => 0644,
             'private' => 0600,
-        ],
-        'dir' => [
+        ),
+        'dir' => array(
             'public' => 0755,
             'private' => 0700,
-        ]
-    ];
+        )
+    );
 
     /**
      * @var string
@@ -71,7 +71,7 @@ class Local extends AbstractAdapter
      *
      * @throws LogicException
      */
-    public function __construct($root, $writeFlags = LOCK_EX, $linkHandling = self::DISALLOW_LINKS, array $permissions = [])
+    public function __construct($root, $writeFlags = LOCK_EX, $linkHandling = self::DISALLOW_LINKS, array $permissions = array())
     {
         $root = is_link($root) ? realpath($root) : $root;
         $this->permissionMap = array_replace_recursive(static::$permissions, $permissions);
@@ -180,7 +180,7 @@ class Local extends AbstractAdapter
         $location = $this->applyPathPrefix($path);
         $stream = fopen($location, 'rb');
 
-        return ['type' => 'file', 'path' => $path, 'stream' => $stream];
+        return array('type' => 'file', 'path' => $path, 'stream' => $stream);
     }
 
     /**
@@ -226,7 +226,7 @@ class Local extends AbstractAdapter
             return false;
         }
 
-        return ['type' => 'file', 'path' => $path, 'contents' => $contents];
+        return array('type' => 'file', 'path' => $path, 'contents' => $contents);
     }
 
     /**
@@ -269,11 +269,11 @@ class Local extends AbstractAdapter
      */
     public function listContents($directory = '', $recursive = false)
     {
-        $result = [];
+        $result = array();
         $location = $this->applyPathPrefix($directory);
 
         if ( ! is_dir($location)) {
-            return [];
+            return array();
         }
 
         $iterator = $recursive ? $this->getRecursiveDirectoryIterator($location) : $this->getDirectoryIterator($location);
@@ -319,11 +319,11 @@ class Local extends AbstractAdapter
         $finfo = new Finfo(FILEINFO_MIME_TYPE);
         $mimetype = $finfo->file($location);
 
-        if (in_array($mimetype, ['application/octet-stream', 'inode/x-empty'])) {
+        if (in_array($mimetype, array('application/octet-stream', 'inode/x-empty'))) {
             $mimetype = Util\MimeType::detectByFilename($location);
         }
 
-        return ['path' => $path, 'type' => 'file', 'mimetype' => $mimetype];
+        return array('path' => $path, 'type' => 'file', 'mimetype' => $mimetype);
     }
 
     /**
@@ -375,7 +375,7 @@ class Local extends AbstractAdapter
         if ( ! is_dir($location) && ! mkdir($location, $this->permissionMap['dir'][$visibility], true)) {
             $return = false;
         } else {
-            $return = ['path' => $dirname, 'type' => 'dir'];
+            $return = array('path' => $dirname, 'type' => 'dir');
         }
 
         umask($umask);
@@ -490,10 +490,10 @@ class Local extends AbstractAdapter
      */
     protected function mapFileInfo(SplFileInfo $file)
     {
-        $normalized = [
+        $normalized = array(
             'type' => $file->getType(),
             'path' => $this->getFilePath($file),
-        ];
+        );
 
         $normalized['timestamp'] = $file->getMTime();
 

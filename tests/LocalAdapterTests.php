@@ -52,7 +52,35 @@ function mkdir($pathname, $mode = 0777, $recursive = false, $context = null)
 
 class LocalAdapterTests extends TestCase
 {
-    use \PHPUnitHacks;
+    /**
+     * @param string $exception
+     */
+    public function expectException($exception)
+    {
+        if (is_callable('parent::expectException')) {
+            return parent::expectException($exception);
+        }
+
+        parent::setExpectedException($exception);
+    }
+
+    /**
+     * Returns a test double for the specified class.
+     *
+     * @param string $originalClassName
+     *
+     * @return PHPUnit_Framework_MockObject_MockObject
+     *
+     * @throws PHPUnit_Framework_Exception
+     */
+    protected function createMock($originalClassName)
+    {
+        if (is_callable('parent::createMock')) {
+            return parent::createMock($originalClassName);
+        }
+
+        return $this->getMock($originalClassName);
+    }
 
     /**
      * @var Local
@@ -92,7 +120,8 @@ class LocalAdapterTests extends TestCase
             $this->markTestSkipped('Windows does not support this.');
         }
 
-        (new Local(__DIR__.'/files'))->write('file.txt', 'contents', new Config());
+        $class = new Local(__DIR__.'/files');
+        $class->write('file.txt', 'contents', new Config());
 
         $adapter = new Local('file://'.__DIR__.'/files');
         $this->assertCount(1, $adapter->listContents());
@@ -100,7 +129,8 @@ class LocalAdapterTests extends TestCase
 
     public function testRelativeRootsAreSupportes()
     {
-        (new Local(__DIR__ . '/files'))->write('file.txt', 'contents', new Config());
+        $class = new Local(__DIR__ . '/files');
+        $class->write('file.txt', 'contents', new Config());
 
         $adapter = new Local(__DIR__ . '/files/../files');
         $this->assertCount(1, $adapter->listContents());
@@ -139,7 +169,7 @@ class LocalAdapterTests extends TestCase
         $temp = tmpfile();
         fwrite($temp, 'dummy');
         rewind($temp);
-        $adapter->writeStream('dir/file.txt', $temp, new Config(['visibility' => 'public']));
+        $adapter->writeStream('dir/file.txt', $temp, new Config(array('visibility' => 'public')));
         fclose($temp);
         $this->assertTrue($adapter->has('dir/file.txt'));
         $result = $adapter->read('dir/file.txt');
@@ -150,7 +180,7 @@ class LocalAdapterTests extends TestCase
     public function testListingNonexistingDirectory()
     {
         $result = $this->adapter->listContents('nonexisting/directory');
-        $this->assertEquals([], $result);
+        $this->assertEquals(array(), $result);
     }
 
     public function testUpdateStream()
@@ -175,7 +205,7 @@ class LocalAdapterTests extends TestCase
     public function testCopy()
     {
         $adapter = $this->adapter;
-        $adapter->write('file.ext', 'content', new Config(['visibility' => 'public']));
+        $adapter->write('file.ext', 'content', new Config(array('visibility' => 'public')));
         $this->assertTrue($adapter->copy('file.ext', 'new.ext'));
         $this->assertTrue($adapter->has('new.ext'));
         $adapter->delete('file.ext');
@@ -456,7 +486,8 @@ class LocalAdapterTests extends TestCase
     {
         $adapter = new Local(__DIR__ . '/files/', LOCK_EX);
         $adapter->write('test.xlsx', '', new Config);
-        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $adapter->getMimetype('test.xlsx')['mimetype']);
+        $tmp = $adapter->getMimetype('test.xlsx');
+        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $tmp['mimetype']);
     }
 
     /**

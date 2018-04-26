@@ -15,11 +15,11 @@ class FtpManualRecursionIntegrationTests extends FtpIntegrationTestCase
      */
     protected function setup_adapter()
     {
-        return new Ftp([
+        return new Ftp(array(
             'host'            => 'localhost',
             'username'        => 'bob',
             'password'        => 'test',
             'recurseManually' => true,
-        ]);
+        ));
     }
 }

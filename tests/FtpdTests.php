@@ -7,9 +7,37 @@ use PHPUnit\Framework\TestCase;
 
 class FtpdTests extends TestCase
 {
-    use \PHPUnitHacks;
+    /**
+     * @param string $exception
+     */
+    public function expectException($exception)
+    {
+        if (is_callable('parent::expectException')) {
+            return parent::expectException($exception);
+        }
 
-    protected $options = [
+        parent::setExpectedException($exception);
+    }
+
+    /**
+     * Returns a test double for the specified class.
+     *
+     * @param string $originalClassName
+     *
+     * @return PHPUnit_Framework_MockObject_MockObject
+     *
+     * @throws PHPUnit_Framework_Exception
+     */
+    protected function createMock($originalClassName)
+    {
+        if (is_callable('parent::createMock')) {
+            return parent::createMock($originalClassName);
+        }
+
+        return $this->getMock($originalClassName);
+    }
+
+    protected $options = array(
         'host' => 'example.org',
         'port' => 40,
         'ssl' => true,
@@ -20,7 +48,7 @@ class FtpdTests extends TestCase
         'passive' => false,
         'username' => 'user',
         'password' => 'password',
-    ];
+    );
 
     public function testInstantiable()
     {
@@ -34,7 +62,9 @@ class FtpdTests extends TestCase
         $this->assertFalse($adapter->has('syno.not.found'));
         $result = $adapter->getMimetype('something.txt');
         $this->assertEquals('text/plain', $result['mimetype']);
-        $this->assertInternalType('array', $adapter->write('syno.unknowndir/file.txt', 'contents', new Config(['visibility' => 'public'])));
+        $this->assertInternalType('array', $adapter->write('syno.unknowndir/file.txt', 'contents', new Config(
+            array('visibility' => 'public')
+        )));
         $this->assertInternalType('array', $adapter->getTimestamp('some/file.ext'));
     }
 
@@ -45,7 +75,7 @@ class FtpdTests extends TestCase
     {
         $adapter = new Ftpd($this->options);
         $result = $adapter->listContents('fail.rawlist');
-        $this->assertEquals([], $result);
+        $this->assertEquals(array(), $result);
     }
 
     /**
