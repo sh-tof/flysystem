@@ -2,6 +2,8 @@
 
 namespace League\Flysystem\Stub;
 
+use LogicException;
+
 class NotSupportingVisibilityStub
 {
     /**

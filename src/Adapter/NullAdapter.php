@@ -3,6 +3,7 @@
 namespace League\Flysystem\Adapter;
 
 use League\Flysystem\Config;
+use League\Flysystem\Util;
 
 class NullAdapter extends AbstractAdapter
 {

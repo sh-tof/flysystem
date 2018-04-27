@@ -3,6 +3,7 @@
 namespace League\Flysystem\Stub;
 
 use League\Flysystem\Config;
+use League\Flysystem\Util;
 
 class StreamedWritingStub
 {
