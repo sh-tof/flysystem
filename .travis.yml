@@ -5,9 +5,17 @@ services:
 language: php
 
 php:
-  - 5.3
   - 5.6
   - 7.2
+
+matrix:
+  include:
+    - php: 5.3
+      dist: precise
+      env: COMPOSER_OPTS=""
+    - php: 5.3
+      dist: precise
+      env: COMPOSER_OPTS="--prefer-lowest"
 
 sudo: false
 
